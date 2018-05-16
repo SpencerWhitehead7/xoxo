@@ -29,7 +29,7 @@ const getInput = player => async () => {
 const game = createStore(gameReducer)
 
 // Debug: Print the state
-game.subscribe(() => console.log(game.getState()))
+// game.subscribe(() => console.log(game.getState()))
 
 game.subscribe(printBoard)
 game.subscribe(getInput(`X`))
@@ -43,6 +43,11 @@ game.subscribe(() => {
 		process.stdout.clearLine()
 		process.stdout.write(`Game drawn`)
 		process.exit(0)
+	}
+})
+game.subscribe(() => {
+	if(game.getState().error){
+		process.stdout.write(`${game.getState().error}`)
 	}
 })
 

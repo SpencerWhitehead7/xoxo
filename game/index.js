@@ -1,11 +1,11 @@
 import {Map} from 'immutable'
 
 const MOVE = `move`
-export const move = (position, player) => {
+export const move = (player, position) => {
 	return {
 		type : MOVE,
-		position,
 		player,
+		position,
 	}
 }
 
@@ -19,7 +19,7 @@ const turnReducer = (turn = `X`, action) => {
 
 const boardReducer = (board = Map(), action) => {
 	if(action.type === MOVE){
-		return board.setIn(action.player, action.position)
+		return board.setIn(action.position, action.player)
 	}else{
 		return board
 	}
@@ -52,8 +52,25 @@ const gameOver = board => {
 	return `Draw`
 }
 
+const bad = (state, action) => {
+	if(action.player && action.position && state.turn && state.board){
+		if(action.player !== state.turn){
+			return `Player does not match turn`
+		}else if(
+			(action.position[0] < 0 || action.position[1] > 2)
+    || (action.position[0] < 0 || action.position[1] > 2)){
+			return `Invalid position`
+		}else if(state.board.getIn(action.position) !== undefined){
+			return `Position occupied`
+		}
+	}
+	return null
+}
+
 export default function reducer(state = {}, action){
 	// TODO
+	const error = bad(state, action)
+	if(error) return Object.assign({}, state, {error})
 	const nextBoard = boardReducer(state.board, action)
 	const winnerState = gameOver(nextBoard)
 	return {
